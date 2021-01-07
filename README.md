@@ -1,0 +1,2 @@
+# GoogleNewsPHP
+Google News fetcher
