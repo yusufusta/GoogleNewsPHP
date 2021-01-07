@@ -1,0 +1,19 @@
+{
+    "name": "quiec/googlenewsphp",
+    "authors": [
+        {
+            "name": "Quiec",
+            "email": "yusuf@fusuf.codes"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "^7.0",
+        "imangazaliev/didom": "^1.16",
+        "campo/random-user-agent": "^1.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Quiec\\": "./src/"
+        }
+    }
+}
