@@ -13,9 +13,9 @@ class GoogleNews {
     public function __construct($language = 'en', $location = 'US', $topic = 'NATION', $max = 100, $openGraph = False) {
         $this->rssTopicUrl = $this->rssTopicUrl . $topic;
         $this->langConfig = [
-            'hl' => $language,
+            'hl' => strtolower($language) . '-' . strtoupper($location),
             'gl' => $location,
-            'ceid' => strtoupper($location) . ':' . strtolower($language)
+            'ceid' =>  strtolower($location) . ':' . strtoupper($language)
         ];
         $this->Client = new Client([
             'headers' => [
@@ -44,15 +44,15 @@ class GoogleNews {
             ->first('channel')
             ->find('item');
         foreach ($Items as $Item) {
+            if (count($News) >= $this->Max) break;
             $Data = [
                 'title' => $Item->first('title')->text(),
-                'link' => $Item->first('link')->text(),
+                'url' => $Item->first('link')->text(),
                 'time' => strtotime($Item->first('pubDate')->text()),
                 'description' => $Item->first('description')->text(),
-                'source' => [
-                    'name' => $Item->first('source')->text(),
-                    'url' => $Item->first('source')->url
-                ]
+                'source_name' => $Item->first('source')->text(),
+                'source_url' => $Item->first('source')->url,
+                'tags' => []
             ];
 
             if ($this->openGraph) {
@@ -67,13 +67,19 @@ class GoogleNews {
                         $Content = $Meta->getAttribute('content');
     
                         if ($Property == 'og:image') {
-                            $Data['image']['url'] = $Content;
+                            $Data['image_url'] = $Content;
                         } else if ($Property == 'og:description') {
                             $Data['description'] = $Content;
                         } else if ($Property == 'og:url') {
-                            $Data['link'] = $Content;
+                            $Data['url'] = $Content;
                         } else if ($Property == 'og:title') {
                             $Data['title'] = $Content;
+                        } else if ($Property == 'description') {
+                            $Data['description'] = $Content;
+                        } else if ($Property == 'article:published_time') {
+                            $Data['time'] = strtotime($Content);
+                        } else if ($Property == 'article:tag') {
+                            $Data['tags'][] = $Content;
                         }
                     }
                 }     
